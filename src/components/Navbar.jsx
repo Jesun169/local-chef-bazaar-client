@@ -1,8 +1,18 @@
 import { Link, NavLink } from "react-router";
 import { motion } from "framer-motion";
 import logo from "../assets/logo of LCB.png";
+import useAuth from "../hooks/useAuth";
 
 const Navbar = () => {
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout()
+      .then(() => {
+      })
+      .catch(err => console.log(err));
+  };
+
   return (
     <motion.nav
       initial={{ y: -40, opacity: 0 }}
@@ -50,6 +60,7 @@ const Navbar = () => {
           </span>
         </Link>
       </div>
+
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal gap-2 text-base font-medium">
           <li>
@@ -75,12 +86,23 @@ const Navbar = () => {
           </li>
         </ul>
       </div>
+
       <div className="navbar-end">
-        <motion.div whileTap={{ scale: 0.95 }}>
-          <Link to="/login" className="btn btn-primary px-6">
-            Login
-          </Link>
-        </motion.div>
+        {user ? (
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            onClick={handleLogout}
+            className="btn btn-outline btn-error px-6"
+          >
+            Logout
+          </motion.button>
+        ) : (
+          <motion.div whileTap={{ scale: 0.95 }}>
+            <Link to="/login" className="btn btn-primary px-6">
+              Login
+            </Link>
+          </motion.div>
+        )}
       </div>
     </motion.nav>
   );
