@@ -13,14 +13,12 @@ const MealDetails = () => {
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState({ rating: 5, comment: "" });
 
-  // Fetch meal details
   useEffect(() => {
     fetch(`http://localhost:5000/meals/${id}`)
       .then(res => res.json())
       .then(data => setMeal(data));
   }, [id]);
 
-  // Fetch reviews for this meal
   const fetchReviews = () => {
     fetch(`http://localhost:5000/reviews?foodId=${id}`)
       .then(res => res.json())
@@ -31,7 +29,6 @@ const MealDetails = () => {
     fetchReviews();
   }, [id]);
 
-  // Submit a review
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     if (!user) return toast.error("Please login first!");
@@ -61,7 +58,6 @@ const MealDetails = () => {
     }
   };
 
-  // Add meal to favorites
   const handleAddFavorite = async () => {
     if (!user) return toast.error("Please login first!");
     if (!meal) return;
@@ -98,7 +94,7 @@ const MealDetails = () => {
     <div className="max-w-3xl mx-auto py-10 px-4 space-y-10">
       <Toaster />
 
-      {/* Meal Details */}
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -122,7 +118,7 @@ const MealDetails = () => {
         </button>
       </motion.div>
 
-      {/* Review Form */}
+      {/* Review*/}
       {user && (
         <form
           onSubmit={handleReviewSubmit}
@@ -163,7 +159,7 @@ const MealDetails = () => {
         </form>
       )}
 
-      {/* Reviews List */}
+      {/* Review List */}
       <div className="space-y-6 mt-6">
         <h2 className="text-2xl font-bold">Reviews</h2>
         {reviews.length === 0 && <p>No reviews yet.</p>}

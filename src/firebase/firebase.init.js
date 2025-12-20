@@ -3,13 +3,13 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBtQeiyYXGb2BzutszJrwAO8GYdtlSvaik",
-  authDomain: "local-chef-bazaar-ff60f.firebaseapp.com",
-  projectId: "local-chef-bazaar-ff60f",
-  storageBucket: "local-chef-bazaar-ff60f.appspot.com",
-  messagingSenderId: "661995798004",
-  appId: "1:661995798004:web:e7fcd234053ab6bd660da1",
-  measurementId: "G-6EJQRL19Q8",
+  apiKey:import.meta.env.VITE_apiKey,
+  authDomain:import.meta.env.VITE_authDomain,
+  projectId:import.meta.env.VITE_projectId,
+  storageBucket:import.meta.env.VITE_storageBucket,
+  messagingSenderId:import.meta.env.VITE_messagingSenderId,
+  appId:import.meta.env.VITE_appId,
+  measurementId:import.meta.env.VITE_measurementId,
 };
 
 const app = initializeApp(firebaseConfig);

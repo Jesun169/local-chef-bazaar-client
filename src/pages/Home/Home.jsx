@@ -11,7 +11,6 @@ const Home = () => {
   const [meals, setMeals] = useState([]);
   const [reviews, setReviews] = useState([]);
 
-  // Fetch meals (limited to 6)
   useEffect(() => {
     fetch("http://localhost:5000/meals?limit=6")
       .then(res => res.json())
@@ -19,7 +18,6 @@ const Home = () => {
       .catch(err => console.error(err));
   }, []);
 
-  // Fetch reviews
   useEffect(() => {
     fetch("http://localhost:5000/reviews")
       .then(res => res.json())
@@ -122,8 +120,8 @@ const Home = () => {
 
     <div className="grid md:grid-cols-3 gap-8">
       {reviews
-        .slice(-3) // Take last 3 reviews
-        .reverse() // Show newest first
+        .slice(-3)
+        .reverse()
         .map((review) => (
           <motion.div
             key={review._id}
