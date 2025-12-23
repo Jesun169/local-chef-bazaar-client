@@ -1,72 +1,53 @@
-import React, { createContext, useState, useEffect } from "react";
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  GoogleAuthProvider,
-  signOut,
-  onAuthStateChanged,
-  updateProfile,
+import { createContext, useState, useEffect } from "react";
+import { 
+  getAuth, 
+  signInWithEmailAndPassword, 
+  onAuthStateChanged, 
+  signOut 
 } from "firebase/auth";
-
 import app from "../firebase/firebase.init";
 
 export const AuthContext = createContext(null);
-
 const auth = getAuth(app);
-const googleProvider = new GoogleAuthProvider();
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const createUser = (email, password) => {
+  const signInUser = async (email, password) => {
     setLoading(true);
-    return createUserWithEmailAndPassword(auth, email, password);
+    const credential = await signInWithEmailAndPassword(auth, email, password);
+
+    // Fetch role from backend
+    const res = await fetch(`https://local-chef-bazaar-server-black.vercel.app/users/role/${email}`);
+    const data = await res.json();
+    
+    setUser({ ...credential.user, role: data.role });
+    setLoading(false);
   };
 
-  const signInUser = (email, password) => {
-    setLoading(true);
-    return signInWithEmailAndPassword(auth, email, password);
-  };
-
-  const signInWithGoogle = () => {
-    setLoading(true);
-    return signInWithPopup(auth, googleProvider);
-  };
-
-  const updateUserProfile = (profile) => {
-    if (auth.currentUser) {
-      return updateProfile(auth.currentUser, profile);
-    }
-  };
-
-  const logout = () => {
-    setLoading(true);
-    return signOut(auth);
+  const logout = async () => {
+    await signOut(auth);
+    setUser(null);
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        // Fetch role from backend
+        const res = await fetch(`https://local-chef-bazaar-server-black.vercel.app/users/role/${firebaseUser.email}`);
+        const data = await res.json();
+        setUser({ ...firebaseUser, role: data.role });
+      } else {
+        setUser(null);
+      }
       setLoading(false);
     });
     return () => unsubscribe();
   }, []);
 
-  const authInfo = {
-    user,
-    loading,
-    createUser,
-    signInUser,
-    signInWithGoogle,
-    updateUserProfile,
-    logout,
-  };
-
   return (
-    <AuthContext.Provider value={authInfo}>
+    <AuthContext.Provider value={{ user, loading, signInUser, logout }}>
       {children}
     </AuthContext.Provider>
   );

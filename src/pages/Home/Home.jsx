@@ -12,14 +12,14 @@ const Home = () => {
   const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/meals?limit=6")
+    fetch("https://local-chef-bazaar-server-black.vercel.app/meals?limit=6")
       .then(res => res.json())
       .then(data => setMeals(data))
       .catch(err => console.error(err));
   }, []);
 
   useEffect(() => {
-    fetch("http://localhost:5000/reviews")
+    fetch("https://local-chef-bazaar-server-black.vercel.app/reviews")
       .then(res => res.json())
       .then(data => setReviews(data))
       .catch(err => console.error(err));
@@ -65,13 +65,13 @@ const Home = () => {
               className="h-[320px] md:h-[400px]"
             >
               <SwiperSlide>
-                <img src="/src/assets/banner-1.png" className="h-full w-full object-cover" alt="Food 1"/>
+                <img src="/assets/banner-1.png" className="h-full w-full object-cover" alt="Food 1"/>
               </SwiperSlide>
               <SwiperSlide>
-                <img src="/src/assets/banner-2.jpg" className="h-full w-full object-cover" alt="Food 2"/>
+                <img src="/assets/banner-2.jpg" className="h-full w-full object-cover" alt="Food 2"/>
               </SwiperSlide>
               <SwiperSlide>
-                <img src="/src/assets/banner-3.jpg" className="h-full w-full object-cover" alt="Food 3"/>
+                <img src="/assets/banner-3.jpg" className="h-full w-full object-cover" alt="Food 3"/>
               </SwiperSlide>
             </Swiper>
           </motion.div>
@@ -91,7 +91,7 @@ const Home = () => {
               whileHover={{ scale: 1.03 }}
             >
               <figure>
-                <img src={meal.image} alt={meal.name} className="h-48 w-full object-cover" />
+                <img src={meal.foodImage} alt={meal.name} className="h-48 w-full object-cover" />
               </figure>
               <div className="card-body">
                 <h3 className="card-title">{meal.foodName}</h3>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useParams, Link } from "react-router";
 import { motion } from "framer-motion";
 import { FaStar } from "react-icons/fa";
 import toast, { Toaster } from "react-hot-toast";
@@ -14,13 +14,13 @@ const MealDetails = () => {
   const [newReview, setNewReview] = useState({ rating: 5, comment: "" });
 
   useEffect(() => {
-    fetch(`http://localhost:5000/meals/${id}`)
+    fetch(`https://local-chef-bazaar-server-black.vercel.app/meals/${id}`)
       .then(res => res.json())
       .then(data => setMeal(data));
   }, [id]);
 
   const fetchReviews = () => {
-    fetch(`http://localhost:5000/reviews?foodId=${id}`)
+    fetch(`https://local-chef-bazaar-server-black.vercel.app/reviews?foodId=${id}`)
       .then(res => res.json())
       .then(data => setReviews(data));
   };
@@ -39,28 +39,29 @@ const MealDetails = () => {
       reviewerImage: user.photoURL || "https://i.ibb.co/default-user.png",
       rating: newReview.rating,
       comment: newReview.comment,
+      date: new Date().toISOString(),
     };
 
     try {
-      const res = await fetch("http://localhost:5000/reviews", {
+      const res = await fetch("https://local-chef-bazaar-server-black.vercel.app/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(review),
       });
       const data = await res.json();
+
       if (data.insertedId) {
         toast.success("Review submitted successfully!");
         setNewReview({ rating: 5, comment: "" });
         fetchReviews();
       }
-    } catch (err) {
+    } catch {
       toast.error("Failed to submit review");
     }
   };
 
   const handleAddFavorite = async () => {
     if (!user) return toast.error("Please login first!");
-    if (!meal) return;
 
     const favorite = {
       userEmail: user.email,
@@ -69,81 +70,92 @@ const MealDetails = () => {
       chefId: meal.chefId,
       chefName: meal.chefName,
       price: meal.price,
+      addedTime: new Date().toISOString(),
     };
 
     try {
-      const res = await fetch("http://localhost:5000/favorites", {
+      const res = await fetch("https://local-chef-bazaar-server-black.vercel.app/favorites", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(favorite),
       });
       const data = await res.json();
+
       if (data.insertedId) {
         toast.success("Added to favorites!");
       } else if (data.message) {
         toast.error(data.message);
       }
-    } catch (err) {
+    } catch {
       toast.error("Failed to add to favorites");
     }
   };
 
-  if (!meal) return <div className="text-center py-20">Loading...</div>;
+  if (!meal) return <div className="text-center py-20"><span className="loading loading-dots loading-xl"></span></div>;
 
   return (
     <div className="max-w-3xl mx-auto py-10 px-4 space-y-10">
       <Toaster />
 
-
+      {/* Meal Info */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="bg-base-100 shadow-lg rounded-xl p-6"
       >
         <h1 className="text-3xl font-bold mb-4">{meal.foodName}</h1>
+
         <img
           src={meal.foodImage}
           alt={meal.foodName}
           className="w-full h-64 object-cover mb-4 rounded-lg"
         />
+
         <p>👨‍🍳 {meal.chefName}</p>
         <p>📍 {meal.deliveryArea}</p>
         <p>💰 BDT {meal.price}</p>
         <p>⭐ {meal.rating}</p>
-        <button
-          className="btn btn-primary mt-4 mr-4"
-          onClick={handleAddFavorite}
-        >
-          Add to Favorites
-        </button>
+
+        {/* Buttons */}
+        <div className="flex gap-4 mt-6">
+          <Link to={`/order/${meal._id}`}>
+            <button className="btn btn-success">
+              Order Now
+            </button>
+          </Link>
+
+          <button
+            className="btn btn-primary"
+            onClick={handleAddFavorite}
+          >
+            Add to Favorites
+          </button>
+        </div>
       </motion.div>
 
-      {/* Review*/}
+      {/* Review Form */}
       {user && (
         <form
           onSubmit={handleReviewSubmit}
-          className="space-y-3 mt-4 bg-base-100 p-6 rounded-xl shadow"
+          className="space-y-3 bg-base-100 p-6 rounded-xl shadow"
         >
           <h3 className="font-semibold text-lg">Give Review</h3>
+
           <div className="flex items-center gap-2">
             <label>Rating:</label>
             <select
               value={newReview.rating}
               onChange={(e) =>
-                setNewReview({
-                  ...newReview,
-                  rating: parseInt(e.target.value),
-                })
+                setNewReview({ ...newReview, rating: parseInt(e.target.value) })
               }
               className="select select-bordered w-24"
             >
-              {[5, 4, 3, 2, 1].map((n) => (
-                <option key={n} value={n}>
-                  {n}
-                </option>
+              {[5, 4, 3, 2, 1].map(n => (
+                <option key={n} value={n}>{n}</option>
               ))}
             </select>
           </div>
+
           <textarea
             value={newReview.comment}
             onChange={(e) =>
@@ -153,17 +165,20 @@ const MealDetails = () => {
             placeholder="Write your review..."
             required
           />
+
           <button type="submit" className="btn btn-primary">
             Submit Review
           </button>
         </form>
       )}
 
-      {/* Review List */}
-      <div className="space-y-6 mt-6">
+      {/* Reviews List */}
+      <div className="space-y-6">
         <h2 className="text-2xl font-bold">Reviews</h2>
+
         {reviews.length === 0 && <p>No reviews yet.</p>}
-        {reviews.map((rev) => (
+
+        {reviews.map(rev => (
           <motion.div
             key={rev._id}
             className="bg-base-200 p-4 rounded-lg shadow-sm"
@@ -181,11 +196,13 @@ const MealDetails = () => {
                 </p>
               </div>
             </div>
+
             <div className="flex gap-1 mb-1">
               {[...Array(rev.rating)].map((_, i) => (
                 <FaStar key={i} className="text-yellow-400" />
               ))}
             </div>
+
             <p>{rev.comment}</p>
           </motion.div>
         ))}

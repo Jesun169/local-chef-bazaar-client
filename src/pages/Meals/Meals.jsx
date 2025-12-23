@@ -30,7 +30,7 @@ const Meals = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("http://localhost:5000/meals")
+    fetch("https://local-chef-bazaar-server-black.vercel.app/meals")
       .then(res => res.json())
       .then(data => setMeals(data));
   }, []);
@@ -96,7 +96,7 @@ const Meals = () => {
               transition={{ duration: 0.4 }}
             >
               <img
-                src={meal.image}
+                src={meal.foodImage}
                 alt={meal.name}
                 className="h-48 w-full object-cover"
               />

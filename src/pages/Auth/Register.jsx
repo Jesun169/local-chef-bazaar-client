@@ -36,7 +36,7 @@ const Register = () => {
         status: "active"
       };
 
-      await fetch("http://localhost:5000/users", {
+      await fetch("https://local-chef-bazaar-server-black.vercel.app/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userInfo)
