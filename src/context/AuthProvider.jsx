@@ -1,9 +1,11 @@
-import { createContext, useState, useEffect } from "react";
-import { 
-  getAuth, 
-  signInWithEmailAndPassword, 
-  onAuthStateChanged, 
-  signOut 
+import { createContext, useEffect, useState } from "react";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile,
+  onAuthStateChanged,
+  signOut,
 } from "firebase/auth";
 import app from "../firebase/firebase.init";
 
@@ -14,14 +16,27 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const createUser = (email, password) => {
+    setLoading(true);
+    return createUserWithEmailAndPassword(auth, email, password);
+  };
+
+  const updateUserProfile = (name, photo) => {
+    return updateProfile(auth.currentUser, {
+      displayName: name,
+      photoURL: photo,
+    });
+  };
+
   const signInUser = async (email, password) => {
     setLoading(true);
     const credential = await signInWithEmailAndPassword(auth, email, password);
 
-    // Fetch role from backend
-    const res = await fetch(`https://local-chef-bazaar-server-black.vercel.app/users/role/${email}`);
+    const res = await fetch(
+      `https://local-chef-bazaar-server-black.vercel.app/users/role/${email}`
+    );
     const data = await res.json();
-    
+
     setUser({ ...credential.user, role: data.role });
     setLoading(false);
   };
@@ -33,21 +48,39 @@ const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        // Fetch role from backend
-        const res = await fetch(`https://local-chef-bazaar-server-black.vercel.app/users/role/${firebaseUser.email}`);
-        const data = await res.json();
-        setUser({ ...firebaseUser, role: data.role });
-      } else {
+      try {
+        if (firebaseUser) {
+          const res = await fetch(
+            `https://local-chef-bazaar-server-black.vercel.app/users/role/${firebaseUser.email}`
+          );
+          const data = await res.json();
+
+          setUser({ ...firebaseUser, role: data.role });
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        console.error("Auth restore failed", error);
         setUser(null);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
+
     return () => unsubscribe();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, signInUser, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        createUser,
+        updateUserProfile,
+        signInUser,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

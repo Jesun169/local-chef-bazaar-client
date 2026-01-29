@@ -12,9 +12,9 @@ const PlatformStats = () => {
         setError("");
 
         const [usersRes, mealsRes, ordersRes] = await Promise.all([
-          fetch("https://local-chef-bazaar-server-black.vercel.app/users"),
-          fetch("https://local-chef-bazaar-server-black.vercel.app/meals"),
-          fetch("https://local-chef-bazaar-server-black.vercel.app/orders"),
+          fetch("http://https://local-chef-bazaar-server-black.vercel.app/users"),
+          fetch("http://https://local-chef-bazaar-server-black.vercel.app/meals"),
+          fetch("http://https://local-chef-bazaar-server-black.vercel.app/orders"),
         ]);
 
         if (!usersRes.ok || !mealsRes.ok || !ordersRes.ok) {

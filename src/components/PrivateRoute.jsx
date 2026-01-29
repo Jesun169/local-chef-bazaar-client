@@ -6,7 +6,11 @@ const PrivateRoute = ({ children }) => {
   const location = useLocation();
 
   if (loading) {
-    return <div className="text-center mt-20">Loading...</div>;
+    return (
+      <div className="text-center mt-20 text-lg">
+        Loading user info...
+      </div>
+    );
   }
 
   if (!user) {

@@ -2,27 +2,21 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import MainLayout from "../Layouts/MainLayout";
 import DashboardLayout from "../Layouts/DashboardLayout";
 import useAuth from "../hooks/useAuth";
-
-// Pages
 import Home from "../pages/Home/Home";
 import Login from "../pages/Auth/Login";
+import Register from "../pages/Auth/Register";
 import Meals from "../pages/Meals/Meals";
 import MealDetails from "../pages/MealDetails/MealDetails";
 import Order from "../pages/Order/Order";
 
-// User
 import MyProfile from "../pages/Dashboard/User/MyProfile";
 import MyOrders from "../pages/Dashboard/User/MyOrders";
 import FavoriteMeals from "../pages/Dashboard/User/FavoriteMeals";
 import MyReviews from "../pages/Dashboard/User/MyReviews";
-
-// Chef
 import ChefProfile from "../pages/Dashboard/Chef/ChefProfile";
 import CreateMeal from "../pages/Dashboard/Chef/CreateMeal";
 import MyMeals from "../pages/Dashboard/Chef/MyMeals";
 import OrderRequests from "../pages/Dashboard/Chef/OrderRequests";
-
-// Admin
 import AdminProfile from "../pages/Dashboard/Admin/AdminProfile";
 import ManageUsers from "../pages/Dashboard/Admin/ManageUsers";
 import ManageRequests from "../pages/Dashboard/Admin/ManageRequests";
@@ -35,7 +29,6 @@ const PrivateRoute = ({ children }) => {
   if (!user) return <Navigate to="/login" replace />;
   return children;
 };
-
 
 const RoleCheck = ({ children, role }) => {
   const { user, loading } = useAuth();
@@ -54,8 +47,16 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Home /> },
       { path: "login", element: <Login /> },
+      { path: "register", element: <Register /> },
       { path: "meals", element: <Meals /> },
-      { path: "meals/:id", element: <PrivateRoute><MealDetails /></PrivateRoute>  },
+      {
+        path: "meals/:id",
+        element: (
+          <PrivateRoute>
+            <MealDetails />
+          </PrivateRoute>
+        ),
+      },
       {
         path: "order/:id",
         element: (
