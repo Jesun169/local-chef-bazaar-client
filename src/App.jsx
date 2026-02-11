@@ -1,16 +1,16 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { RouterProvider } from "react-router-dom";
+import router from "./routes/router";
+import useAuth from "./hooks/useAuth";
+import FullPageLoader from "./components/FullPageLoader";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { loading } = useAuth();
 
-  return (
-    <>
-      <h1>Local Chef Bazaar</h1>
-    </>
-  )
+  if (loading) {
+    return <FullPageLoader />;
+  }
+
+  return <RouterProvider router={router} />;
 }
 
-export default App
+export default App;

@@ -10,7 +10,6 @@ const MyReviews = () => {
   const [updatedComment, setUpdatedComment] = useState("");
   const [updatedRating, setUpdatedRating] = useState("");
 
-  // Fetch reviews
   useEffect(() => {
     if (!user?.email) return;
     fetch(`https://local-chef-bazaar-server-black.vercel.app/reviews?userEmail=${user.email}`)
@@ -19,7 +18,6 @@ const MyReviews = () => {
       .catch(() => toast.error("Failed to fetch reviews"));
   }, [user?.email]);
 
-  // Delete review
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this review?")) return;
     try {
@@ -32,14 +30,13 @@ const MyReviews = () => {
     }
   };
 
-  // Open update modal
   const handleEdit = (review) => {
     setEditingReview(review);
     setUpdatedComment(review.comment);
     setUpdatedRating(review.rating);
   };
 
-  // Submit updated review
+
   const handleUpdate = async () => {
     if (!updatedComment || !updatedRating) return toast.error("All fields are required");
     try {
@@ -88,7 +85,6 @@ const MyReviews = () => {
         </motion.div>
       ))}
 
-      {/* Update Modal */}
       {editingReview && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg w-96">

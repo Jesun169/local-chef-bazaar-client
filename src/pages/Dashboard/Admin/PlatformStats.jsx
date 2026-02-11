@@ -1,40 +1,34 @@
 import { useEffect, useState } from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 const PlatformStats = () => {
-  const [stats, setStats] = useState({ users: 0, meals: 0, orders: 0 });
+  const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        setLoading(true);
-        setError("");
+        const res = await fetch(
+          "https://local-chef-bazaar-server-black.vercel.app/admin/stats"
+        );
 
-        const [usersRes, mealsRes, ordersRes] = await Promise.all([
-          fetch("http://https://local-chef-bazaar-server-black.vercel.app/users"),
-          fetch("http://https://local-chef-bazaar-server-black.vercel.app/meals"),
-          fetch("http://https://local-chef-bazaar-server-black.vercel.app/orders"),
-        ]);
-
-        if (!usersRes.ok || !mealsRes.ok || !ordersRes.ok) {
-          throw new Error("Failed to fetch data from server");
+        if (!res.ok) {
+          throw new Error("Failed to fetch statistics");
         }
 
-        const [usersData, mealsData, ordersData] = await Promise.all([
-          usersRes.json(),
-          mealsRes.json(),
-          ordersRes.json(),
-        ]);
-
-        setStats({
-          users: Array.isArray(usersData) ? usersData.length : 0,
-          meals: Array.isArray(mealsData) ? mealsData.length : 0,
-          orders: Array.isArray(ordersData) ? ordersData.length : 0,
-        });
+        const data = await res.json();
+        setStats(data);
       } catch (err) {
         console.error(err);
-        setError(err.message || "Something went wrong");
+        setError("Failed to load statistics");
       } finally {
         setLoading(false);
       }
@@ -43,17 +37,51 @@ const PlatformStats = () => {
     fetchStats();
   }, []);
 
-  if (loading) return <div className="text-center mt-6">Loading stats...</div>;
-  if (error) return <div className="text-center mt-6 text-red-500">{error}</div>;
+  if (loading) return <p className="text-center mt-6">Loading statistics...</p>;
+  if (error) return <p className="text-center mt-6 text-red-500">{error}</p>;
+
+  const chartData = [
+    { name: "Users", value: stats.totalUsers },
+    { name: "Pending Orders", value: stats.pendingOrders },
+    { name: "Delivered Orders", value: stats.deliveredOrders },
+  ];
 
   return (
-    <div className="max-w-3xl mx-auto mt-6 p-4 bg-white shadow rounded">
-      <h2 className="text-2xl text-blue-500 font-bold mb-4">Platform Statistics</h2>
-      <div className="space-y-2">
-        <p className="text-black">Total Users: <span className="font-semibold">{stats.users}</span></p>
-        <p  className="text-black">Total Meals: <span className="font-semibold">{stats.meals}</span></p>
-        <p className="text-black">Total Orders: <span className="font-semibold">{stats.orders}</span></p>
+    <div className="max-w-4xl mx-auto mt-6 p-6 bg-white shadow rounded">
+      <h2 className="text-2xl font-bold text-blue-600 mb-6">
+        Platform Statistics
+      </h2>
+
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div className="p-4 bg-gray-100 rounded text-black">
+          <p className="text-sm">Total Users</p>
+          <p className="text-xl font-bold">{stats.totalUsers}</p>
+        </div>
+
+        <div className="p-4 bg-gray-100 rounded text-black">
+          <p className="text-sm">Pending Orders</p>
+          <p className="text-xl font-bold">{stats.pendingOrders}</p>
+        </div>
+
+        <div className="p-4 bg-gray-100 rounded text-black">
+          <p className="text-sm">Delivered Orders</p>
+          <p className="text-xl font-bold">{stats.deliveredOrders}</p>
+        </div>
+
+        <div className="p-4 bg-gray-100 rounded text-black">
+          <p className="text-sm">Total Payment</p>
+          <p className="text-xl font-bold">৳ {stats.totalPaymentAmount}</p>
+        </div>
       </div>
+
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart data={chartData}>
+          <XAxis dataKey="name" />
+          <YAxis />
+          <Tooltip />
+          <Bar dataKey="value" />
+        </BarChart>
+      </ResponsiveContainer>
     </div>
   );
 };

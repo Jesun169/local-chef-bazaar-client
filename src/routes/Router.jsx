@@ -1,7 +1,7 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import MainLayout from "../Layouts/MainLayout";
 import DashboardLayout from "../Layouts/DashboardLayout";
-import useAuth from "../hooks/useAuth";
+
 import Home from "../pages/Home/Home";
 import Login from "../pages/Auth/Login";
 import Register from "../pages/Auth/Register";
@@ -13,37 +13,27 @@ import MyProfile from "../pages/Dashboard/User/MyProfile";
 import MyOrders from "../pages/Dashboard/User/MyOrders";
 import FavoriteMeals from "../pages/Dashboard/User/FavoriteMeals";
 import MyReviews from "../pages/Dashboard/User/MyReviews";
+
 import ChefProfile from "../pages/Dashboard/Chef/ChefProfile";
 import CreateMeal from "../pages/Dashboard/Chef/CreateMeal";
 import MyMeals from "../pages/Dashboard/Chef/MyMeals";
 import OrderRequests from "../pages/Dashboard/Chef/OrderRequests";
+
 import AdminProfile from "../pages/Dashboard/Admin/AdminProfile";
 import ManageUsers from "../pages/Dashboard/Admin/ManageUsers";
 import ManageRequests from "../pages/Dashboard/Admin/ManageRequests";
 import PlatformStats from "../pages/Dashboard/Admin/PlatformStats";
 
+import PrivateRoute from "../components/PrivateRoute";
 
-const PrivateRoute = ({ children }) => {
-  const { user, loading } = useAuth();
-  if (loading) return <div>Loading...</div>;
-  if (!user) return <Navigate to="/login" replace />;
-  return children;
-};
-
-const RoleCheck = ({ children, role }) => {
-  const { user, loading } = useAuth();
-
-  if (loading) return <div>Loading...</div>;
-  if (!user) return <Navigate to="/login" replace />;
-  if (user.role !== role) return <Navigate to="/" replace />;
-
-  return children;
-};
+import RoleRoute from "./RoleRoute";
+import ErrorPage from "../components/ErrorPage";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <MainLayout />,
+    errorElement: <ErrorPage />,
     children: [
       { index: true, element: <Home /> },
       { path: "login", element: <Login /> },
@@ -74,78 +64,79 @@ export const router = createBrowserRouter([
         <DashboardLayout />
       </PrivateRoute>
     ),
+    errorElement: <ErrorPage />,
     children: [
-      // USER
+      // User
       { path: "profile", element: <MyProfile /> },
       { path: "order", element: <MyOrders /> },
       { path: "favorites", element: <FavoriteMeals /> },
       { path: "reviews", element: <MyReviews /> },
 
-      // CHEF
+      // Chef
       {
         path: "chef/profile",
         element: (
-          <RoleCheck role="chef">
+          <RoleRoute role="chef">
             <ChefProfile />
-          </RoleCheck>
+          </RoleRoute>
         ),
       },
       {
         path: "chef/create-meal",
         element: (
-          <RoleCheck role="chef">
+          <RoleRoute role="chef">
             <CreateMeal />
-          </RoleCheck>
+          </RoleRoute>
         ),
       },
       {
         path: "chef/my-meals",
         element: (
-          <RoleCheck role="chef">
+          <RoleRoute role="chef">
             <MyMeals />
-          </RoleCheck>
+          </RoleRoute>
         ),
       },
       {
         path: "chef/order-requests",
         element: (
-          <RoleCheck role="chef">
+          <RoleRoute role="chef">
             <OrderRequests />
-          </RoleCheck>
+          </RoleRoute>
         ),
       },
 
-      // ADMIN
+      // admin
       {
         path: "admin/profile",
         element: (
-          <RoleCheck role="admin">
+          <RoleRoute role="admin">
             <AdminProfile />
-          </RoleCheck>
+          </RoleRoute>
         ),
       },
       {
         path: "admin/manage-users",
         element: (
-          <RoleCheck role="admin">
+          <RoleRoute role="admin">
             <ManageUsers />
-          </RoleCheck>
+          </RoleRoute>
         ),
       },
       {
         path: "admin/manage-requests",
         element: (
-          <RoleCheck role="admin">
+          <RoleRoute role="admin">
             <ManageRequests />
-          </RoleCheck>
+          </RoleRoute>
         ),
       },
       {
         path: "admin/platform-stats",
         element: (
-          <RoleCheck role="admin">
+          <RoleRoute role="admin">
             <PlatformStats />
-          </RoleCheck>
+          </RoleRoute>
         ),
       },
     ],

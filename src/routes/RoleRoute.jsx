@@ -1,20 +1,23 @@
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate } from "react-router";
 import useAuth from "../hooks/useAuth";
 import FullPageLoader from "../components/FullPageLoader";
 
-const PrivateRoute = ({ children }) => {
+const RoleRoute = ({ role, children }) => {
   const { user, loading } = useAuth();
-  const location = useLocation();
 
   if (loading) {
     return <FullPageLoader />;
   }
 
   if (!user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user.role !== role) {
+    return <Navigate to="/" replace />;
   }
 
   return children;
 };
 
-export default PrivateRoute;
+export default RoleRoute;
