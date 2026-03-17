@@ -23,131 +23,83 @@ const Order = () => {
 
   const totalPrice = meal.price * quantity;
 
-  const handleConfirmOrder = () => {
-    if (!address) {
-      Swal.fire("Address Required!", "Please enter your delivery address", "warning");
-      return;
-    }
+  const handleConfirmOrder = async () => {
+    if (!address) return Swal.fire("Address Required!", "Please enter your delivery address", "warning");
 
-    Swal.fire({
+    const result = await Swal.fire({
       title: "Confirm Order",
-      text: `Your total price is BDT${totalPrice}. Do you want to confirm the order?`,
+      text: `Your total price is BDT${totalPrice}. Confirm?`,
       icon: "question",
       showCancelButton: true,
       confirmButtonText: "Yes, Confirm",
-      cancelButtonText: "Cancel",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        const orderData = {
-          foodId: meal._id,
-          mealName: meal.foodName,
-          price: meal.price,
-          quantity,
-          chefId: meal.chefId,
-          paymentStatus: "Pending",
-          userEmail: user.email,
-          userAddress: address,
-          orderStatus: "pending",
-          orderTime: new Date().toISOString(),
-        };
-
-        const res = await fetch("https://local-chef-bazaar-server-black.vercel.app/orders", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(orderData),
-        });
-
-        const data = await res.json();
-
-        if (data.insertedId) {
-          Swal.fire("Success!", "Order placed successfully!", "success");
-          navigate("/dashboard/order");
-        }
-      }
     });
+
+    if (result.isConfirmed) {
+      const orderData = {
+        foodId: meal._id,
+        mealName: meal.foodName,
+        price: meal.price,
+        quantity,
+        chefId: meal.chefId,
+        paymentStatus: "Pending",
+        userEmail: user.email,
+        userAddress: address,
+        orderStatus: "pending",
+        orderTime: new Date().toISOString(),
+      };
+
+      const res = await fetch("https://local-chef-bazaar-server-black.vercel.app/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderData),
+      });
+
+      const data = await res.json();
+
+      if (data._id) {
+        await Swal.fire("Success!", "Order placed successfully!", "success");
+        navigate("/dashboard/order");
+      } else {
+        Swal.fire("Error!", "Order could not be placed", "error");
+      }
+    }
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-      className="max-w-2xl mx-auto py-12 px-4"
-    >
+    <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="max-w-2xl mx-auto py-12 px-4">
       <div className="bg-base-100 shadow-xl rounded-xl p-6 space-y-5">
         <h2 className="text-2xl font-bold text-blue-600 text-center">🛒 Confirm Your Order</h2>
 
         <div>
           <label className="label">Meal Name</label>
-          <input
-            type="text"
-            value={meal.foodName}
-            readOnly
-            className="input input-bordered w-full"
-          />
+          <input type="text" value={meal.foodName} readOnly className="input input-bordered w-full" />
         </div>
 
         <div>
           <label className="label">Price (BDT)</label>
-          <input
-            type="number"
-            value={meal.price}
-            readOnly
-            className="input input-bordered w-full"
-          />
+          <input type="number" value={meal.price} readOnly className="input input-bordered w-full" />
         </div>
 
         <div>
           <label className="label">Quantity</label>
-          <input
-            type="number"
-            min="1"
-            value={quantity}
-            onChange={(e) => setQuantity(parseInt(e.target.value))}
-            className="input input-bordered w-full"
-          />
-        </div>
-
-        <div>
-          <label className="label">Chef ID</label>
-          <input
-            type="text"
-            value={meal.chefId}
-            readOnly
-            className="input input-bordered w-full"
-          />
+          <input type="number" min="1" value={quantity} onChange={(e) => setQuantity(parseInt(e.target.value))} className="input input-bordered w-full" />
         </div>
 
         <div>
           <label className="label">Your Email</label>
-          <input
-            type="email"
-            value={user.email}
-            readOnly
-            className="input input-bordered w-full"
-          />
+          <input type="email" value={user.email} readOnly className="input input-bordered w-full" />
         </div>
 
         <div>
           <label className="label">Delivery Address</label>
-          <textarea
-            className="textarea textarea-bordered w-full"
-            placeholder="Enter your full delivery address"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            required
-          />
+          <textarea className="textarea textarea-bordered w-full" placeholder="Enter your full delivery address" value={address} onChange={(e) => setAddress(e.target.value)} required />
         </div>
 
         <div className="text-right font-semibold text-blue-600 text-lg">
           Total: BDT {totalPrice}
         </div>
 
-
-        <button
-          onClick={handleConfirmOrder}
-          className="btn btn-primary w-full mt-4"
-        >
+        <button onClick={handleConfirmOrder} className="btn btn-primary w-full mt-4">
           Confirm Order
         </button>
       </div>

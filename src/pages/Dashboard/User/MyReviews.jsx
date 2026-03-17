@@ -10,19 +10,28 @@ const MyReviews = () => {
   const [updatedComment, setUpdatedComment] = useState("");
   const [updatedRating, setUpdatedRating] = useState("");
 
+  // Fetch reviews for the logged-in user
   useEffect(() => {
     if (!user?.email) return;
-    fetch(`https://local-chef-bazaar-server-black.vercel.app/reviews?userEmail=${user.email}`)
+
+    fetch(
+      `https://local-chef-bazaar-server-black.vercel.app/reviews?userEmail=${user.email}`
+    )
       .then((res) => res.json())
       .then((data) => setReviews(data))
       .catch(() => toast.error("Failed to fetch reviews"));
   }, [user?.email]);
 
+  // Delete review
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this review?")) return;
     try {
-      const res = await fetch(`https://local-chef-bazaar-server-black.vercel.app/reviews/${id}`, { method: "DELETE" });
+      const res = await fetch(
+        `https://local-chef-bazaar-server-black.vercel.app/reviews/${id}`,
+        { method: "DELETE" }
+      );
       if (!res.ok) throw new Error();
+
       setReviews(reviews.filter((r) => r._id !== id));
       toast.success("Review deleted successfully");
     } catch {
@@ -30,26 +39,37 @@ const MyReviews = () => {
     }
   };
 
+  // Start editing a review
   const handleEdit = (review) => {
     setEditingReview(review);
     setUpdatedComment(review.comment);
     setUpdatedRating(review.rating);
   };
 
-
+  // Update review
   const handleUpdate = async () => {
-    if (!updatedComment || !updatedRating) return toast.error("All fields are required");
+    if (!updatedComment || !updatedRating)
+      return toast.error("All fields are required");
+
     try {
-      const res = await fetch(`https://local-chef-bazaar-server-black.vercel.app/reviews/${editingReview._id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ comment: updatedComment, rating: updatedRating }),
-      });
+      const res = await fetch(
+        `https://local-chef-bazaar-server-black.vercel.app/reviews/${editingReview._id}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            comment: updatedComment,
+            rating: Number(updatedRating),
+          }),
+        }
+      );
       if (!res.ok) throw new Error();
 
       setReviews(
         reviews.map((r) =>
-          r._id === editingReview._id ? { ...r, comment: updatedComment, rating: updatedRating } : r
+          r._id === editingReview._id
+            ? { ...r, comment: updatedComment, rating: Number(updatedRating) }
+            : r
         )
       );
       toast.success("Review updated successfully");
@@ -73,14 +93,32 @@ const MyReviews = () => {
           animate={{ opacity: 1, y: 0 }}
           className="bg-base-100 shadow-lg rounded-xl p-4"
         >
-          <p className="font-semibold">Meal: {review.mealName}</p>
+          <p className="font-semibold">
+            Meal: {review.mealName || "Unknown Meal"}
+          </p>
+          <p>Reviewer: {review.reviewerName || "Anonymous"}</p>
           <p>Rating: {review.rating}</p>
           <p>Comment: {review.comment}</p>
-          <p>Date: {review.date ? new Date(review.date).toLocaleString() : "Unknown"}</p>
+          <p>
+            Date:{" "}
+            {review.createdAt
+              ? new Date(review.createdAt).toLocaleString()
+              : "Unknown"}
+          </p>
 
           <div className="mt-2 flex gap-2">
-            <button className="btn btn-sm btn-error" onClick={() => handleDelete(review._id)}>Delete</button>
-            <button className="btn btn-sm btn-primary" onClick={() => handleEdit(review)}>Update</button>
+            <button
+              className="btn btn-sm btn-error"
+              onClick={() => handleDelete(review._id)}
+            >
+              Delete
+            </button>
+            <button
+              className="btn btn-sm btn-primary"
+              onClick={() => handleEdit(review)}
+            >
+              Update
+            </button>
           </div>
         </motion.div>
       ))}
@@ -109,8 +147,15 @@ const MyReviews = () => {
               />
             </label>
             <div className="flex justify-end gap-2">
-              <button className="btn btn-secondary" onClick={() => setEditingReview(null)}>Cancel</button>
-              <button className="btn btn-primary" onClick={handleUpdate}>Save</button>
+              <button
+                className="btn btn-secondary"
+                onClick={() => setEditingReview(null)}
+              >
+                Cancel
+              </button>
+              <button className="btn btn-primary" onClick={handleUpdate}>
+                Save
+              </button>
             </div>
           </div>
         </div>

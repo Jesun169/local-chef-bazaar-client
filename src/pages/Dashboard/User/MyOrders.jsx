@@ -39,12 +39,12 @@ const MyOrders = () => {
   }
 
   if (orders.length === 0) {
-    return <div className="text-center py-20">No orders found.</div>;
+    return <div className="text-black text-center py-20">No orders found.</div>;
   }
 
   return (
     <div className="max-w-5xl mx-auto py-10 px-4 space-y-6">
-      <h2 className="text-2xl font-bold mb-4">My Orders</h2>
+      <h2 className=" text-2xl font-bold mb-4">My Orders</h2>
 
       <div className="grid md:grid-cols-2 gap-6">
         {orders.map((order) => (
