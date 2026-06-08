@@ -9,7 +9,6 @@ function App() {
 
   return (
     <>
-      {/* Only one Toaster at the root */}
       <Toaster
         position="top-right"
         toastOptions={{

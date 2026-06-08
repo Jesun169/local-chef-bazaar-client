@@ -48,36 +48,38 @@ const MyReviews = () => {
 
   // Update review
   const handleUpdate = async () => {
-    if (!updatedComment || !updatedRating)
-      return toast.error("All fields are required");
+  if (!updatedComment || !updatedRating)
+    return toast.error("All fields are required");
 
-    try {
-      const res = await fetch(
-        `https://local-chef-bazaar-server-black.vercel.app/reviews/${editingReview._id}`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            comment: updatedComment,
-            rating: Number(updatedRating),
-          }),
-        }
-      );
-      if (!res.ok) throw new Error();
+  try {
+    const res = await fetch(
+      `https://local-chef-bazaar-server-black.vercel.app/reviews/${editingReview._id}`,
+      {
+        method: "PATCH", // ✅ correct method
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          comment: updatedComment,
+          rating: Number(updatedRating),
+        }),
+      }
+    );
 
-      setReviews(
-        reviews.map((r) =>
-          r._id === editingReview._id
-            ? { ...r, comment: updatedComment, rating: Number(updatedRating) }
-            : r
-        )
-      );
-      toast.success("Review updated successfully");
-      setEditingReview(null);
-    } catch {
-      toast.error("Failed to update review");
-    }
-  };
+    if (!res.ok) throw new Error();
+
+    setReviews(
+      reviews.map((r) =>
+        r._id === editingReview._id
+          ? { ...r, comment: updatedComment, rating: Number(updatedRating) }
+          : r
+      )
+    );
+
+    toast.success("Review updated successfully");
+    setEditingReview(null);
+  } catch {
+    toast.error("Failed to update review");
+  }
+};
 
   if (!user) return <div>Loading...</div>;
 
