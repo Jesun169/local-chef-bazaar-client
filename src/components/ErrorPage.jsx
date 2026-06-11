@@ -12,7 +12,7 @@ const ErrorPage = () => {
         </p>
 
         {error && (
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-base-content/80">
             {error.statusText || error.message}
           </p>
         )}

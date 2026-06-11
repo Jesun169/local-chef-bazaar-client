@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import { IoArrowBackCircle } from "react-icons/io5";
 
@@ -15,9 +15,11 @@ const Sidebar = () => {
 
   return (
     <aside className="w-64 bg-black shadow-md p-6 flex flex-col space-y-4 text-white">
+
+      {/* Back Button */}
       <Link
         to="/"
-        className="flex items-center gap-2 mb-4 text-white hover:text-yellow-300"
+        className="flex items-center gap-2 mb-4 hover:text-yellow-300"
       >
         <IoArrowBackCircle size={24} />
         Back to Home
@@ -25,7 +27,7 @@ const Sidebar = () => {
 
       <h2 className="text-xl font-bold mb-4">Dashboard</h2>
 
-
+      {/* USER DASHBOARD */}
       {user?.role === "user" && (
         <>
           <Link to="/dashboard/profile" className="hover:text-yellow-300">
@@ -43,7 +45,7 @@ const Sidebar = () => {
         </>
       )}
 
-
+      {/* CHEF DASHBOARD */}
       {user?.role === "chef" && (
         <>
           <Link to="/dashboard/profile" className="hover:text-yellow-300">
@@ -61,23 +63,36 @@ const Sidebar = () => {
         </>
       )}
 
+      {/* ADMIN DASHBOARD */}
       {user?.role === "admin" && (
         <>
           <Link to="/dashboard/profile" className="hover:text-yellow-300">
             My Profile
           </Link>
+
           <Link to="/dashboard/admin/manage-users" className="hover:text-yellow-300">
             Manage Users
           </Link>
+
           <Link to="/dashboard/admin/manage-requests" className="hover:text-yellow-300">
             Manage Requests
           </Link>
+
           <Link to="/dashboard/admin/platform-stats" className="hover:text-yellow-300">
             Platform Stats
           </Link>
+
+            {/* <Link to="/dashboard/admin/categories" className="hover:text-yellow-300 block">
+              Categories
+            </Link> */}
+
+            {/* <Link to="/dashboard/admin/settings" className="hover:text-yellow-300 block">
+              Settings
+            </Link> */}
         </>
       )}
 
+      {/* NOT LOGGED IN */}
       {!user && <p>Please login to see dashboard links.</p>}
     </aside>
   );

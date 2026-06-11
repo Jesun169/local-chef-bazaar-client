@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
+import { FaGoogle } from "react-icons/fa";
 
 const Login = () => {
-  const { signInUser } = useAuth();
+  const { signInUser, signInWithGoogle } = useAuth(); // ✅ ADD GOOGLE
   const navigate = useNavigate();
   const location = useLocation();
   const [error, setError] = useState("");
-
 
   const from = location.state?.from?.pathname || "/dashboard/profile";
 
@@ -18,10 +18,7 @@ const Login = () => {
     setError("");
 
     try {
-
       await signInUser(email, password);
-
-
       navigate(from, { replace: true });
     } catch (err) {
       console.error(err);
@@ -29,11 +26,24 @@ const Login = () => {
     }
   };
 
+  // ⭐ GOOGLE LOGIN
+  const handleGoogleLogin = async () => {
+    setError("");
+
+    try {
+      await signInWithGoogle();
+      navigate(from, { replace: true });
+    } catch (err) {
+      console.error(err);
+      setError("Google login failed.");
+    }
+  };
+
   return (
     <div className="max-w-md mx-auto p-6 mt-10 shadow-lg rounded-lg">
       <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
 
-      <form onSubmit={handleLogin} className="space-y-4">
+      <form onSubmit={handleLogin} className="space-y-4 text-base-content">
         <input
           name="email"
           type="email"
@@ -41,6 +51,7 @@ const Login = () => {
           className="input input-bordered w-full"
           required
         />
+
         <input
           name="password"
           type="password"
@@ -55,6 +66,15 @@ const Login = () => {
           Login
         </button>
       </form>
+
+      {/* ⭐ GOOGLE LOGIN BUTTON */}
+      <button
+        onClick={handleGoogleLogin}
+        className="btn btn-outline w-full mt-3 flex items-center justify-center gap-2"
+      >
+        <FaGoogle />
+        Continue with Google
+      </button>
 
       <p className="text-center mt-4 text-sm">
         Don't have an account?{" "}

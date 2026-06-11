@@ -8,7 +8,9 @@ import "./index.css";
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <AuthProvider>
-      <RouterProvider router={router} />
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 text-white">
+        <RouterProvider router={router} />
+      </div>
     </AuthProvider>
   </React.StrictMode>
 );

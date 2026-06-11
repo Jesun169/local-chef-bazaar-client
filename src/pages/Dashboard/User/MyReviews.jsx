@@ -10,7 +10,6 @@ const MyReviews = () => {
   const [updatedComment, setUpdatedComment] = useState("");
   const [updatedRating, setUpdatedRating] = useState("");
 
-  // Fetch reviews for the logged-in user
   useEffect(() => {
     if (!user?.email) return;
 
@@ -22,147 +21,218 @@ const MyReviews = () => {
       .catch(() => toast.error("Failed to fetch reviews"));
   }, [user?.email]);
 
-  // Delete review
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this review?")) return;
+
     try {
       const res = await fetch(
         `https://local-chef-bazaar-server-black.vercel.app/reviews/${id}`,
         { method: "DELETE" }
       );
+
       if (!res.ok) throw new Error();
 
-      setReviews(reviews.filter((r) => r._id !== id));
-      toast.success("Review deleted successfully");
+      setReviews((prev) => prev.filter((r) => r._id !== id));
+      toast.success("Review deleted");
     } catch {
       toast.error("Failed to delete review");
     }
   };
 
-  // Start editing a review
   const handleEdit = (review) => {
     setEditingReview(review);
     setUpdatedComment(review.comment);
     setUpdatedRating(review.rating);
   };
 
-  // Update review
   const handleUpdate = async () => {
-  if (!updatedComment || !updatedRating)
-    return toast.error("All fields are required");
+    if (!updatedComment || !updatedRating)
+      return toast.error("All fields required");
 
-  try {
-    const res = await fetch(
-      `https://local-chef-bazaar-server-black.vercel.app/reviews/${editingReview._id}`,
-      {
-        method: "PATCH", // ✅ correct method
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          comment: updatedComment,
-          rating: Number(updatedRating),
-        }),
-      }
+    try {
+      const res = await fetch(
+        `https://local-chef-bazaar-server-black.vercel.app/reviews/${editingReview._id}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            comment: updatedComment,
+            rating: Number(updatedRating),
+          }),
+        }
+      );
+
+      if (!res.ok) throw new Error();
+
+      setReviews((prev) =>
+        prev.map((r) =>
+          r._id === editingReview._id
+            ? { ...r, comment: updatedComment, rating: Number(updatedRating) }
+            : r
+        )
+      );
+
+      toast.success("Review updated");
+      setEditingReview(null);
+    } catch {
+      toast.error("Update failed");
+    }
+  };
+
+  if (!user) {
+    return (
+      <div className="text-center py-20 text-white">
+        Loading...
+      </div>
     );
-
-    if (!res.ok) throw new Error();
-
-    setReviews(
-      reviews.map((r) =>
-        r._id === editingReview._id
-          ? { ...r, comment: updatedComment, rating: Number(updatedRating) }
-          : r
-      )
-    );
-
-    toast.success("Review updated successfully");
-    setEditingReview(null);
-  } catch {
-    toast.error("Failed to update review");
   }
-};
-
-  if (!user) return <div>Loading...</div>;
 
   return (
-    <div className="max-w-4xl mx-auto mt-6 space-y-4">
-      <h2 className="text-2xl text-blue-500 font-bold mb-4">My Reviews</h2>
-      {reviews.length === 0 && <p className="text-black">No reviews yet.</p>}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 py-10 px-4"
+    >
+      <div className="max-w-6xl mx-auto">
 
-      {reviews.map((review) => (
-        <motion.div
-          key={review._id}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-base-100 shadow-lg rounded-xl p-4"
-        >
-          <p className="font-semibold">
-            Meal: {review.mealName || "Unknown Meal"}
-          </p>
-          <p>Reviewer: {review.reviewerName || "Anonymous"}</p>
-          <p>Rating: {review.rating}</p>
-          <p>Comment: {review.comment}</p>
-          <p>
-            Date:{" "}
-            {review.createdAt
-              ? new Date(review.createdAt).toLocaleString()
-              : "Unknown"}
-          </p>
+        {/* MAIN GLASS CARD */}
+        <div className="relative overflow-hidden rounded-[32px] border border-white/20 bg-white/10 backdrop-blur-xl shadow-[0_20px_80px_rgba(59,130,246,0.25)] p-8">
 
-          <div className="mt-2 flex gap-2">
-            <button
-              className="btn btn-sm btn-error"
-              onClick={() => handleDelete(review._id)}
-            >
-              Delete
-            </button>
-            <button
-              className="btn btn-sm btn-primary"
-              onClick={() => handleEdit(review)}
-            >
-              Update
-            </button>
+          {/* Glow */}
+          <div className="absolute top-0 left-0 w-80 h-80 bg-blue-500/20 blur-[120px]" />
+          <div className="absolute bottom-0 right-0 w-80 h-80 bg-cyan-500/20 blur-[120px]" />
+
+          <div className="relative z-10">
+
+            {/* HEADER */}
+            <h2 className="text-4xl font-bold text-white mb-2">
+              My Reviews
+            </h2>
+
+            <p className="text-slate-300 mb-8">
+              Manage your feedback and ratings
+            </p>
+
+            {/* EMPTY */}
+            {reviews.length === 0 ? (
+              <p className="text-slate-300 text-center py-10">
+                No reviews yet
+              </p>
+            ) : (
+              <div className="grid md:grid-cols-2 gap-6">
+
+                {reviews.map((review) => (
+                  <motion.div
+                    key={review._id}
+                    whileHover={{ scale: 1.02 }}
+                    className="relative overflow-hidden rounded-2xl border border-white/20 bg-white/10 backdrop-blur-xl p-5"
+                  >
+                    {/* glow */}
+                    <div className="absolute top-0 left-0 w-40 h-40 bg-blue-500/20 blur-[80px]" />
+
+                    <div className="relative z-10 text-white space-y-2">
+
+                      <h3 className="text-xl font-bold">
+                        {review.mealName || "Unknown Meal"}
+                      </h3>
+
+                      <p className="text-slate-300">
+                        Rating:{" "}
+                        <span className="text-yellow-400 font-semibold">
+                          {review.rating}
+                        </span>
+                      </p>
+
+                      <p className="text-slate-300">
+                        {review.comment}
+                      </p>
+
+                      <p className="text-xs text-slate-400">
+                        {review.createdAt
+                          ? new Date(review.createdAt).toLocaleString()
+                          : "Unknown"}
+                      </p>
+
+                      {/* BUTTONS */}
+                      <div className="flex gap-3 pt-2">
+
+                        <button
+                          onClick={() => handleDelete(review._id)}
+                          className="px-4 py-2 rounded-lg bg-red-500/20 text-red-300 border border-red-500/30 hover:bg-red-500/30 transition"
+                        >
+                          Delete
+                        </button>
+
+                        <button
+                          onClick={() => handleEdit(review)}
+                          className="px-4 py-2 rounded-lg bg-blue-500/20 text-blue-300 border border-blue-500/30 hover:bg-blue-500/30 transition"
+                        >
+                          Edit
+                        </button>
+
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+
+              </div>
+            )}
           </div>
-        </motion.div>
-      ))}
+        </div>
+      </div>
 
+      {/* MODAL */}
       {editingReview && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg w-96">
-            <h3 className="text-xl font-bold mb-4">Update Review</h3>
-            <label className="block mb-2">
-              Rating:
-              <input
-                type="number"
-                min="1"
-                max="5"
-                value={updatedRating}
-                onChange={(e) => setUpdatedRating(e.target.value)}
-                className="input input-bordered w-full mt-1"
-              />
-            </label>
-            <label className="block mb-4">
-              Comment:
-              <textarea
-                value={updatedComment}
-                onChange={(e) => setUpdatedComment(e.target.value)}
-                className="textarea textarea-bordered w-full mt-1"
-              />
-            </label>
-            <div className="flex justify-end gap-2">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="w-[90%] max-w-md rounded-2xl border border-white/20 bg-white/10 backdrop-blur-xl p-6 text-white"
+          >
+
+            <h3 className="text-2xl font-bold mb-4">Update Review</h3>
+
+            <input
+              type="number"
+              min="1"
+              max="5"
+              value={updatedRating}
+              onChange={(e) => setUpdatedRating(e.target.value)}
+              className="w-full mb-3 p-2 rounded bg-white/10 border border-white/20 text-white"
+              placeholder="Rating"
+            />
+
+            <textarea
+              value={updatedComment}
+              onChange={(e) => setUpdatedComment(e.target.value)}
+              className="w-full mb-4 p-2 rounded bg-white/10 border border-white/20 text-white"
+              placeholder="Comment"
+            />
+
+            <div className="flex justify-end gap-3">
+
               <button
-                className="btn btn-secondary"
                 onClick={() => setEditingReview(null)}
+                className="px-4 py-2 rounded bg-white/10 border border-white/20"
               >
                 Cancel
               </button>
-              <button className="btn btn-primary" onClick={handleUpdate}>
+
+              <button
+                onClick={handleUpdate}
+                className="px-4 py-2 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30"
+              >
                 Save
               </button>
+
             </div>
-          </div>
+
+          </motion.div>
+
         </div>
       )}
-    </div>
+    </motion.div>
   );
 };
 

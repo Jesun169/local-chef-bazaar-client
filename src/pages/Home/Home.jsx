@@ -1,11 +1,19 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { FaStar, FaUtensils, FaTruck, FaHeart } from "react-icons/fa";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 import { Link } from "react-router";
+
+import {
+  FaStar,
+  FaUtensils,
+  FaTruck,
+  FaHeart,
+  FaMapMarkerAlt,
+  FaCalendarAlt,
+} from "react-icons/fa";
 
 const Home = () => {
   const [meals, setMeals] = useState([]);
@@ -44,8 +52,8 @@ const Home = () => {
     <div className="space-y-24">
 
       {/* ================= HERO ================= */}
-      <section className="min-h-[65vh] flex items-center bg-base-200">
-        <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-2 items-center gap-10 w-full">
+        <section className="min-h-[50vh] flex items-center relative overflow-hidden">
+        <div className="max-w-7xl glass mx-auto px-4 grid md:grid-cols-2 items-center gap-10 w-full">
 
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -57,7 +65,7 @@ const Home = () => {
               <span className="text-primary">From Local Chefs</span>
             </h1>
 
-            <p className="mt-5 text-gray-600 max-w-md">
+            <p className="mt-5 text-base-content/110 max-w-md">
               Discover hygienic, affordable, and freshly cooked meals from trusted local chefs near you.
             </p>
 
@@ -71,7 +79,7 @@ const Home = () => {
               </Link>
             </div>
 
-            <div className="mt-6 flex gap-6 text-sm opacity-80">
+            <div className="mt-6 flex gap-6 text-sm text-base-content/110">
               <p>🔥 100+ Meals</p>
               <p>👨‍🍳 50+ Chefs</p>
               <p>⭐ 4.8 Rating</p>
@@ -107,57 +115,112 @@ const Home = () => {
       </section>
 
       {/* ================= DAILY MEALS ================= */}
-      <section className="max-w-7xl mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12">
-          🍽 Today’s Special Meals
-        </h2>
+<section className="max-w-7xl mx-auto px-4">
+  <h2 className="text-3xl font-bold text-center mb-12">
+    🍽 Today’s Special Meals
+  </h2>
 
-        {loading ? (
-          <p className="text-center">Loading meals...</p>
-        ) : meals.length === 0 ? (
-          <p className="text-center text-gray-500">No meals available</p>
-        ) : (
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
-            {meals.map(meal => (
-              <motion.div
-                key={meal._id}
-                className="card bg-base-100 shadow-md"
-                whileHover={{ scale: 1.03 }}
-              >
-                <figure>
-                  <img
-                    src={meal.foodImage}
-                    alt={meal.foodName || meal.mealName}
-                    className="h-48 w-full object-cover"
-                  />
-                </figure>
+  {loading ? (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {[...Array(8)].map((_, index) => (
+        <div
+          key={index}
+          className="bg-base-100 rounded-2xl shadow animate-pulse overflow-hidden"
+        >
+          <div className="h-48 bg-gray-300"></div>
 
-                <div className="card-body">
-                  <h3 className="card-title">
-                    {meal.foodName || meal.mealName}
-                  </h3>
+          <div className="p-4 space-y-3">
+            <div className="h-5 bg-gray-300 rounded"></div>
 
-                  <p className="text-sm text-gray-500">
-                    {meal.chefName}
-                  </p>
+            <div className="h-4 bg-gray-300 rounded w-3/4"></div>
 
-                  <div className="flex justify-between items-center mt-2">
-                    <span className="font-bold text-primary">
-                      BDT {meal.price}
-                    </span>
+            <div className="h-4 bg-gray-300 rounded"></div>
 
-                    <Link to={`/meals/${meal._id}`}>
-                      <button className="btn btn-sm btn-outline">
-                        Details
-                      </button>
-                    </Link>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
+            <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+
+            <div className="h-10 bg-gray-300 rounded"></div>
           </div>
-        )}
-      </section>
+        </div>
+      ))}
+    </div>
+  ) : meals.length === 0 ? (
+    <p className="text-center text-base-content/80">
+      No meals available
+    </p>
+  ) : (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {meals.map((meal) => (
+  <motion.div
+    key={meal._id}
+    whileHover={{ scale: 1.03, y: -6 }}
+    className="
+      rounded-2xl overflow-hidden
+      bg-base-100
+      border border-base-300
+      shadow-xl
+      transition-all
+      flex flex-col h-full
+    "
+  >
+    {/* IMAGE */}
+    <img
+      src={meal.foodImage}
+      alt={meal.foodName || meal.mealName}
+      className="h-52 w-full object-cover"
+    />
+
+    {/* CONTENT */}
+    <div className="p-4 flex flex-col flex-grow">
+
+      <h3 className="font-bold text-lg text-base-content line-clamp-1">
+        {meal.foodName || meal.mealName}
+      </h3>
+
+      <p className="text-sm text-base-content/70 mt-2 line-clamp-2">
+        {meal.description ||
+          "Fresh homemade meal prepared by local chefs."}
+      </p>
+
+      <div className="mt-4 space-y-2 text-sm text-base-content/80">
+
+        <p className="flex items-center gap-2">
+          <FaMapMarkerAlt />
+          {meal.location || meal.deliveryArea || "Dhaka"}
+        </p>
+
+        <p className="flex items-center gap-2">
+          <FaCalendarAlt />
+          {meal.createdAt
+            ? new Date(meal.createdAt).toLocaleDateString()
+            : "Recently Added"}
+        </p>
+
+        <p className="flex items-center gap-2">
+          <FaStar className="text-yellow-400" />
+          {Number(meal.rating || 0).toFixed(1)}
+        </p>
+
+      </div>
+
+      <div className="flex justify-between items-center mt-5">
+
+        <span className="text-primary font-bold text-lg">
+          ৳{meal.price}
+        </span>
+
+        <Link to={`/meals/${meal._id}`}>
+          <button className="btn btn-primary btn-sm">
+            View Details
+          </button>
+        </Link>
+
+      </div>
+    </div>
+  </motion.div>
+))}
+    </div>
+  )}
+</section>
 
       {/* ================= BLOG PREVIEW ================= */}
       <section className="max-w-7xl mx-auto px-4">
@@ -188,8 +251,8 @@ const Home = () => {
               whileHover={{ y: -5 }}
               className="bg-base-100 p-6 rounded-xl shadow"
             >
-              <h3 className="font-bold text-lg">{blog.title}</h3>
-              <p className="text-sm text-gray-500 mt-2">
+              <h3 className="font-bold text-lg text-base-content/80">{blog.title}</h3>
+              <p className="text-sm text-base-content/80 mt-2">
                 {blog.desc}
               </p>
 
@@ -207,7 +270,7 @@ const Home = () => {
           ❓ Frequently Asked Questions
         </h2>
 
-        <div className="space-y-4">
+        <div className="space-y-4 text-base-content/80">
 
           <div className="collapse collapse-plus bg-base-100 shadow">
             <input type="radio" name="faq" defaultChecked />
@@ -248,30 +311,30 @@ const Home = () => {
           🌟 Why Choose Us
         </h2>
 
-        <div className="grid md:grid-cols-3 gap-8 text-center">
+        <div className="grid md:grid-cols-3 gap-8 text-center text-base-content/80">
           <div className="p-6 rounded-xl shadow bg-base-100">
             <FaUtensils className="text-4xl text-primary mx-auto mb-4" />
             <h4 className="font-semibold">Home Cooked</h4>
-            <p className="text-sm text-gray-500">Verified chefs only</p>
+            <p className="text-sm text-base-content/80">Verified chefs only</p>
           </div>
 
           <div className="p-6 rounded-xl shadow bg-base-100">
             <FaTruck className="text-4xl text-primary mx-auto mb-4" />
             <h4 className="font-semibold">Fast Delivery</h4>
-            <p className="text-sm text-gray-500">Hot & fresh delivery</p>
+            <p className="text-sm text-base-content/80">Hot & fresh delivery</p>
           </div>
 
           <div className="p-6 rounded-xl shadow bg-base-100">
             <FaHeart className="text-4xl text-primary mx-auto mb-4" />
             <h4 className="font-semibold">Loved by Users</h4>
-            <p className="text-sm text-gray-500">Trusted platform</p>
+            <p className="text-sm text-base-content/80">Trusted platform</p>
           </div>
         </div>
       </section>
 
       {/* ================= REVIEWS ================= */}
       <section className="bg-base-200 py-20">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4 text-base-content/80">
           <h2 className="text-3xl font-bold text-center mb-12">
             💬 Customer Reviews
           </h2>
@@ -305,11 +368,11 @@ const Home = () => {
           📊 Platform Analytics Dashboard
         </h2>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 gap-8 text-base-content/80">
 
           <div className="bg-base-100 p-6 rounded-xl shadow">
             <h3 className="font-bold mb-4">Meals Growth</h3>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-base-content/80">
               Live data coming soon
             </p>
           </div>
@@ -355,24 +418,17 @@ const Home = () => {
       {/* ================= HOW IT WORKS ================= */}
       <section className="max-w-7xl mx-auto px-4 text-center">
         <h2 className="text-3xl font-bold mb-8">⚙ How It Works</h2>
-        <p className="text-gray-500">
+        <p className="text-base-content/110">
           Choose food → Order → Get delivered from local chefs
         </p>
       </section>
 
       {/* ================= FEATURES ================= */}
       <section className="max-w-7xl mx-auto px-4 text-center">
-        <h2 className="text-3xl font-bold mb-8">✨ Features</h2>
-        <p className="text-gray-500">
+        <h2 className="text-3xl font-bold">✨ Features</h2>
+        <p className="py-10 text-base-content/110">
           Secure payments, verified chefs, real-time updates
         </p>
-      </section>
-
-      {/* ================= NEWSLETTER ================= */}
-      <section className="bg-primary text-white py-16 text-center">
-        <h2 className="text-3xl font-bold mb-4">📩 Subscribe</h2>
-        <input className="p-3 rounded text-black" placeholder="Enter email" />
-        <button className="btn btn-dark ml-2">Join</button>
       </section>
 
     </div>

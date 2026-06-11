@@ -8,7 +8,6 @@ const FavoriteMeals = () => {
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch favorites
   useEffect(() => {
     const fetchFavorites = async () => {
       if (!user?.email) return;
@@ -16,12 +15,11 @@ const FavoriteMeals = () => {
       try {
         const res = await fetch(
           `https://local-chef-bazaar-server-black.vercel.app/favorites?email=${user.email}`,
-          { cache: "no-store" } // prevent browser caching
+          { cache: "no-store" }
         );
 
         const data = await res.json();
 
-        // remove duplicates by mealId
         const uniqueFavs = data.filter(
           (fav, index, self) =>
             index === self.findIndex((f) => f.mealId === fav.mealId)
@@ -29,7 +27,8 @@ const FavoriteMeals = () => {
 
         setFavorites(uniqueFavs);
       } catch (err) {
-        console.error("Failed to fetch favorites:", err);
+        console.error(err);
+        toast.error("Failed to load favorites");
       } finally {
         setLoading(false);
       }
@@ -39,96 +38,137 @@ const FavoriteMeals = () => {
   }, [user]);
 
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(
-      "Remove this meal from favorites?"
-    );
-    if (!confirmDelete) return;
+    const confirm = window.confirm("Remove from favorites?");
+    if (!confirm) return;
 
     try {
       const res = await fetch(
         `https://local-chef-bazaar-server-black.vercel.app/favorites/${id}`,
-        {
-          method: "DELETE",
-        }
+        { method: "DELETE" }
       );
 
       const data = await res.json();
 
       if (res.ok && data.success) {
-        setFavorites((prev) => prev.filter((fav) => fav._id !== id));
-        toast.success("Meal removed from favorites!");
+        setFavorites((prev) => prev.filter((f) => f._id !== id));
+        toast.success("Removed from favorites");
       } else {
-        toast.error(data.message || "Failed to delete favorite.");
+        toast.error(data.message || "Failed to delete");
       }
     } catch (err) {
-      console.error(err);
-      toast.error("Server error while deleting.");
+      toast.error("Server error");
     }
   };
 
   if (loading) {
-    return <div className="text-center mt-10">Loading...</div>;
+    return (
+      <div className="text-center py-20 text-white">
+        Loading...
+      </div>
+    );
   }
 
   if (!user) {
-    return <div className="text-center mt-10">Please login first.</div>;
+    return (
+      <div className="text-center py-20 text-white">
+        Please login first
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-5xl mx-auto mt-6">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 py-10 px-4"
+    >
       <Toaster />
 
-      <h2 className="text-2xl text-blue-500 font-bold mb-4">
-        Favorite Meals
-      </h2>
+      <div className="max-w-6xl mx-auto">
 
-      {favorites.length === 0 ? (
-        <p className="text-black">No favorite meals yet.</p>
-      ) : (
-        <motion.table
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="table w-full bg-base-100 shadow-lg rounded-xl"
-        >
-          <thead>
-            <tr>
-              <th>Meal Name</th>
-              <th>Chef Name</th>
-              <th>Price</th>
-              <th>Date Added</th>
-              <th>Action</th>
-            </tr>
-          </thead>
+        {/* MAIN GLASS CARD */}
+        <div className="relative overflow-hidden rounded-[32px] border border-white/20 bg-white/10 backdrop-blur-xl shadow-[0_20px_80px_rgba(59,130,246,0.25)] p-8">
 
-          <tbody>
-            {favorites.map((fav) => (
-              <motion.tr
-                key={fav._id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
-                <td>{fav.mealName}</td>
-                <td>{fav.chefName}</td>
-                <td>{fav.price ? `BDT ${fav.price}` : "—"}</td>
-                <td>
-                  {fav.addedTime
-                    ? new Date(fav.addedTime).toLocaleDateString()
-                    : "—"}
-                </td>
-                <td>
-                  <button
-                    onClick={() => handleDelete(fav._id)}
-                    className="btn btn-sm btn-error text-white"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </motion.tr>
-            ))}
-          </tbody>
-        </motion.table>
-      )}
-    </div>
+          {/* Glow */}
+          <div className="absolute top-0 left-0 w-80 h-80 bg-blue-500/20 blur-[120px]" />
+          <div className="absolute bottom-0 right-0 w-80 h-80 bg-cyan-500/20 blur-[120px]" />
+
+          <div className="relative z-10">
+
+            {/* HEADER */}
+            <h2 className="text-4xl font-bold text-white mb-2">
+              Favorite Meals
+            </h2>
+
+            <p className="text-slate-300 mb-8">
+              Your saved meals collection
+            </p>
+
+            {favorites.length === 0 ? (
+              <p className="text-slate-300 text-center py-10">
+                No favorite meals yet.
+              </p>
+            ) : (
+              <div className="overflow-x-auto rounded-2xl border border-white/20 bg-white/10 backdrop-blur-xl">
+
+                <table className="w-full text-white">
+                  <thead className="bg-white/10 text-left">
+                    <tr>
+                      <th className="p-4">Meal</th>
+                      <th className="p-4">Chef</th>
+                      <th className="p-4">Price</th>
+                      <th className="p-4">Added</th>
+                      <th className="p-4">Action</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {favorites.map((fav) => (
+                      <tr
+                        key={fav._id}
+                        className="border-t border-white/10 hover:bg-white/10 transition"
+                      >
+                        <td className="p-4 font-semibold">
+                          {fav.mealName}
+                        </td>
+
+                        <td className="p-4 text-slate-300">
+                          {fav.chefName}
+                        </td>
+
+                        <td className="p-4 text-slate-300">
+                          {fav.price ? `৳${fav.price}` : "—"}
+                        </td>
+
+                        <td className="p-4 text-slate-300">
+                          {fav.addedTime
+                            ? new Date(fav.addedTime).toLocaleDateString()
+                            : "—"}
+                        </td>
+
+                        <td className="p-4">
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => handleDelete(fav._id)}
+                            className="px-4 py-2 rounded-lg bg-red-500/20 text-red-300 border border-red-500/30 hover:bg-red-500/30 transition"
+                          >
+                            Remove
+                          </motion.button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+
+                </table>
+
+              </div>
+            )}
+
+          </div>
+        </div>
+      </div>
+    </motion.div>
   );
 };
 

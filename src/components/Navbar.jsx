@@ -40,7 +40,7 @@ const Navbar = () => {
 
   const navLinks = (
     <>
-      {["/", "/meals", "/explore", "/about"].map((path, i) => (
+      {["/", "/meals", "/about", "/contact"].map((path, i) => (
         <li key={i}>
           <NavLink
             to={path}
@@ -139,7 +139,7 @@ const Navbar = () => {
                   />
                 </label>
 
-                <ul className="menu dropdown-content mt-3 p-3 shadow bg-base-100 rounded-box w-60">
+                <ul className="menu dropdown-content mt-3 p-3 shadow bg-base-100 rounded-box w-60 text-base-content/80">
                   <li className="font-bold truncate">{user.displayName}</li>
                   <li className="text-xs truncate">{user.email}</li>
                   <hr />

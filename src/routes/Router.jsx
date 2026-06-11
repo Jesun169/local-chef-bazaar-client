@@ -24,10 +24,17 @@ import ManageUsers from "../pages/Dashboard/Admin/ManageUsers";
 import ManageRequests from "../pages/Dashboard/Admin/ManageRequests";
 import PlatformStats from "../pages/Dashboard/Admin/PlatformStats";
 
+
 import PrivateRoute from "../components/PrivateRoute";
 
 import RoleRoute from "./RoleRoute";
 import ErrorPage from "../components/ErrorPage";
+import Categories from "../pages/Dashboard/Admin/Categories";
+import Settings from "../pages/Dashboard/Admin/Settings";
+import About from "../pages/About/About";
+import Blog from "../pages/Blog/Blog";
+import BlogDetails from "../pages/Blog/BlogDetails";
+import Contact from "../pages/Contact/Contact";
 
 export const router = createBrowserRouter([
   {
@@ -38,7 +45,11 @@ export const router = createBrowserRouter([
       { index: true, element: <Home /> },
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
-      { path: "meals", element: <Meals /> },
+      { path: "meals", element: <Meals /> }, 
+      { path: "about", element: <About/> }, 
+      { path: "blog", element: <Blog/>},
+      { path: "blog/:id", element: <BlogDetails/> },
+      { path: "contact", element: <Contact/> },
       {
         path: "meals/:id",
         element: (
@@ -136,6 +147,22 @@ export const router = createBrowserRouter([
         element: (
           <RoleRoute role="admin">
             <PlatformStats />
+          </RoleRoute>
+        ),
+      },
+      {
+        path: "admin/categories",
+        element: (
+          <RoleRoute role="admin">
+            <Categories/>
+          </RoleRoute>
+        ),
+      },
+      {
+        path: "admin/settings",
+        element: (
+          <RoleRoute role="admin">
+            <Settings/>
           </RoleRoute>
         ),
       },
